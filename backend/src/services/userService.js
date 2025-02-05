@@ -3,28 +3,63 @@ const validations = require('../middlewares/validations')
 const Otp = require('../models/otpModel');
 const otpUtils = require('../utils/otpUtils')
 
-exports.registerUser = async ({ username, email, phoneNumber, loginType }) => {
-    if (loginType === 'social') {
-        
-        if (!email) throw new Error('Email and password are required for social login.');
-        const existingUser = await validations.isEmailRegistered(email);
-        if (existingUser) throw new Error('User already registered with this email.');
-        // const hashedPassword = await validations.hashPassword(password);
-        // const newUser = new userModel({ username, email, password: hashedPassword, loginType });
-        // const hashedPassword = await validations.hashPassword(password);
-        const newUser = new userModel({ username, email, loginType });
-        return await newUser.save();
-    } else if (loginType === 'mobile') {
-        if (!phoneNumber) throw new Error('Phone number is required for mobile login.');
-        const existingUser = await userModel.findOne({ phoneNumber });
-        if (existingUser) throw new Error('User already registered with this phone number.');
-        const newUser = new userModel({ username, phoneNumber, loginType });
-        return await newUser.save();
-    } else {
-        throw new Error('Invalid login type.');
+
+
+exports.registerUser = async ({ username, email, password, loginType }) => {
+    if (loginType !== 'social') throw new Error('Invalid login type.');
+
+    if (!email || !password) {
+        throw new Error('Email and password are required for social login.');
     }
+
+    const existingUser = await validations.isEmailRegistered(email);
+    if (existingUser) {
+        throw new Error('User already registered with this email.');
+    }
+
+    const hashedPassword = await validations.hashPassword(password);
+    const newUser = new userModel({ username, email, password: hashedPassword, loginType });
+
+    return await newUser.save();
 };
 
+exports.socialLogin = async ({ email, password }) => {
+    const user = await validations.isEmailRegistered(email);
+    if (!user) throw new Error('Invalid email or user does not exist.');
+
+    const validPassword = await validations.comparePassword(password, user.password);
+    if (!validPassword) throw new Error('Invalid password.');
+    return user;
+};
+
+exports.getUserById = async (userId) => {
+    return await userModel.findById(userId);
+}
+
+
+exports.updateUserProfile = async (userId, updateData) => {
+    const user = await userModel.findById(userId);
+    if (!user) throw new Error('User not found');
+    
+    return await userModel.findByIdAndUpdate(userId, updateData, { new: true });
+};
+
+// exports.updateUserProfile = async (userId, updateData) => {
+//     const user = await userModel.findById(userId)
+//     if (!user) {
+//         throw new Error('User not found');
+//     }
+//     return await userModel.findByIdAndUpdate(userId, updateData, { new: true });
+// }
+
+// exports.saveProfileImage = async (userId, imagePath) => {
+//     const user = await userModel.findById(userId);
+//     if(!user) throw new Error('User not found');
+
+//     user.profileImage = imagePath;
+//     await user.save();
+//     return imagePath;
+// }
 // exports.socialLogin = async ({ email, password }) => {
 //     const user = await validations.isEmailRegistered(email);
 //     if (!user) throw new Error('Invalid email or user does not exist.');

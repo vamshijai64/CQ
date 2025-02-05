@@ -2,10 +2,19 @@ const express = require('express')
 const router = express.Router();
 const userController = require('../controllers/userController')
 
-// Social login
-router.post('/social-register', userController.socialRegister);
-// router.post('/social-login', userController.socialLogin);
+const upload = require('../middlewares/uploadMiddleware'); // Middleware for handling file uploads
 
+// Social login (Google)
+router.post('/social-register', userController.socialRegister);
+router.post('/social-login', userController.socialLogin);
+
+
+router.get('/profile/:userId', userController.getUserProfile);
+router.put('/profile/update', upload.single('profileImage'), userController.updateUserProfile);
+
+// router.get('/profile/:userId', userController.getUserProfile);
+// router.post('/profile/upload', upload.single('profileImage'), userController.updateProfileImage);
+// router.put('/profile/edit', userController.editUserProfile);
 
 // Mobile login
 // router.post('/mobile-register', userController.mobileRegister);

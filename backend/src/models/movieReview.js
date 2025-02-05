@@ -14,8 +14,12 @@ const movieReviewSchema = new mongoose.Schema({
         type:Number,
         required:true,min:1,max:5
     },
+    imageUrl:{
+        type:String,
+        required:true
+    },
     user:{
-        type:Number,
+        type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:true
     },  

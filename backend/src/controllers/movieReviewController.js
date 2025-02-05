@@ -2,12 +2,12 @@
 
     exports.addMovieReview = async (req, res) => {
         try {
-            const { title, content, rating, user } = req.body;
+            const { title, content, rating,imageUrl, user } = req.body;
     
            
     
             // Call the service to save the review
-            const movieReview = await movieReviewService.addMovieReview({ title, content, rating, user });
+            const movieReview = await movieReviewService.addMovieReview({ title, content, rating, user,imageUrl });
     
             // Respond with success
             res.status(201).json({ message: 'Movie review added successfully', movieReview });
@@ -22,6 +22,17 @@
         try {
             const title = req.params.title;
             const review = await movieReviewService.getMovieReviewBytitle(title);
+            res.json(review);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+    exports.getMovieReviewById = async (req, res) => {
+        
+        try {
+            const {id} = req.params.id;
+            const review = await movieReviewService.getMovieReviewById(id);
             res.json(review);
         } catch (error) {
             res.status(500).json({ error: error.message });
