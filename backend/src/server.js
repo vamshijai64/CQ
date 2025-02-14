@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const helmet = require('helmet');
-// require('dotenv-safe').config();
+
 require('dotenv').config();
 
 const { errorHandler } = require('./middlewares/errorHandler');
@@ -22,7 +22,7 @@ const bannerRoutes=require('./routes/bannerRoutes')
 
 // require('./utils/scheduleOtp') //Periodically clear expired OTP records from the database to avoid bloating the collection.
 
-const port = process.env.PORT;
+const port = process.env.PORT || 6000;
 
 connectDB();
 
@@ -35,6 +35,10 @@ app.use((req,res,next)=>{ // Middleware to log the request method and URL
 app.use(cors())
 app.use(helmet()); // Secure HTTP headers
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+app.use('/uploads',express.static('uploads')) 
+//http://localhost:6000/uploads/1701234567890.jpg
 
 app.use('/user', userRoutes)
 app.use("/api", bannerRoutes); 
@@ -56,6 +60,6 @@ app.use(errorHandler);
 app.listen(port, () => { 
     console.log(`Server running on http://localhost:${port}/`)
 });
-app.get('/te', (req, res) => {
+app.get('/test', (req, res) => {
     res.send('Server is up and running!');
 });

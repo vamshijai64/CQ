@@ -2,12 +2,22 @@
 
     exports.addMovieReview = async (req, res) => {
         try {
-            const { title, content, rating,imageUrl, user } = req.body;
-    
-           
-    
-            // Call the service to save the review
-            const movieReview = await movieReviewService.addMovieReview({ title, content, rating, user,imageUrl });
+            const { title, content, rating, user } = req.body;
+            const imageFile =req.file
+
+            let imageUrl = null;
+            if (imageFile) {
+              imageUrl = `/uploads/${imageFile.filename}`; // ✅ Store image URL
+            }
+           // Call the service to save the review
+
+            const movieReview = await movieReviewService.addMovieReview({ 
+                title,
+                 content, 
+                 rating,
+                  user,
+                  imageUrl
+                 });
     
             // Respond with success
             res.status(201).json({ message: 'Movie review added successfully', movieReview });

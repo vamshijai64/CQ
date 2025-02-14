@@ -24,7 +24,7 @@ const bannerSchema= new mongoose.Schema({
         default:null
 
     } ,
-      // ✅ This will allow adding dynamic fields
+      //  This will allow adding dynamic fields
       additionalData: {
         type: mongoose.Schema.Types.Mixed, // Accepts any object structure
         default: {}

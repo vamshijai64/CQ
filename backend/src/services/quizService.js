@@ -1,8 +1,11 @@
 const QuizModel = require("../models/QuizModel");
+const mongoose = require("mongoose");
+
+
 
 const subcategoryModel = require("../models/subcategoryModel");
 
-exports.createQuiz = async (title, subcategory, questions) => {
+exports.createQuiz = async (title, subcategory,category, questions) => {
   try {
     const subcategoryDoc = await subcategoryModel.findById(subcategory);
     if (!subcategoryDoc) {
@@ -25,8 +28,14 @@ exports.createQuiz = async (title, subcategory, questions) => {
         // });
       }
 
-    const quiz = new QuizModel({ title, subcategory: subcategoryDoc._id, questions });
-    return await quiz.save();
+    const quiz = new QuizModel({ title, subcategory: subcategoryDoc._id, category, questions });
+    const savedQuiz= await quiz.save();
+
+
+    subcategoryDoc.quizzes.push(savedQuiz._id);
+    await subcategoryDoc.save();
+
+    return savedQuiz;
 
   } catch (error) {
     throw new Error('Error creating quiz:' + error.message);
@@ -40,6 +49,16 @@ exports.getQuizzesBySubcategory = async (subcategoryId) => {
     throw new Error('Error fetching quizzes: ' + error.message);
   }
 };
+
+// exports.getQuizzesBySubcategory = async (subcategoryId) => {
+//   const quizzes = await QuizModel.find({ subcategory: subcategoryId });
+
+//   //  Limit questions to 9 per quiz
+//   return quizzes.map(quiz => ({
+//       ...quiz._doc,
+//       questions: quiz.questions.slice(0, 9) // ✅ Only take the first 9 questions
+//   }))
+// };
 
 exports.getAllQuizzes = async () => {
   try {
@@ -66,6 +85,62 @@ exports.getAllQuizzes = async () => {
     throw new Error('Error fetching quizzes: ' + error.message);
   }
 };
+
+
+
+exports.getRandomQuestionsBySubcategory = async (subcategoryId) => {
+  try {
+    const objectId = new mongoose.Types.ObjectId(subcategoryId); // Convert to ObjectId
+
+    const quizzes = await QuizModel.aggregate([
+        { $match: { subcategory: objectId } }, // Ensure subcategory ID matches
+        { $unwind: "$questions" }, // Flatten questions array
+        { $sample: { size: 9 } }, // Get 9 random questions
+        { 
+            $project: { 
+                _id: 0, 
+                "questions.question": 1, 
+                "questions.options": 1, 
+                "questions.correctOption": 1 
+            } 
+        } 
+    ]);
+
+    return quizzes.map(q => q.questions); // Return only questions array
+} catch (error) {
+    console.error("Error fetching random questions:", error);
+    return [];
+}// Extract only the question objects
+};
+
+
+exports.getLatestQuizzes = async ({ page, limit, category, subcategory }) => {
+    const query = {};
+    
+    if (category) query.category = category;
+    if (subcategory) query.subcategory = subcategory;
+
+    const quizzes = await QuizModel.find(query)
+        .sort({ createdAt: -1 })  // Sort by latest
+        .skip((page - 1) * limit) // Pagination
+        .limit(limit)
+        .populate('category subcategory'); // Populate category details
+
+    const totalQuizzes = await QuizModel.countDocuments(query);
+
+    return {
+        quizzes,
+        totalQuizzes,
+        currentPage: page,
+        totalPages: Math.ceil(totalQuizzes / limit)
+    };
+};
+
+
+
+
+
+
 
 
 // exports.getAllQuizzes = async () => {

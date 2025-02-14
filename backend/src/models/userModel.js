@@ -53,15 +53,28 @@
 const mongoose = require('mongoose')
 const userSchema = mongoose.Schema({
    
-    username: { type: String, unique: true, required: true },
+    // username: { type: String, unique: true, required: true },
+    // email: { type: String, unique: true, sparse: true }, // Email is optional for mobile login
+    // password: { type: String }, // Password is optional for mobile login
+    // // phoneNumber: { type: String, unique: true, sparse: true }, // Phone number for mobile login
+    // loginType: { type: String, enum: ['social', 'admin'], required: true }, // To differentiate login types
+    // role: { type: String, enum: ['user', 'admin'], default: 'user' }, // ✅ Role-based access
+    // gender: { type: String, enum: ['male', 'female'] },
+    // profileImage: { type: String } // Store image URL or path
+
+
+    username: { type: String, unique: true, required: false },
     email: { type: String, unique: true, sparse: true }, // Email is optional for mobile login
     password: { type: String }, // Password is optional for mobile login
     // phoneNumber: { type: String, unique: true, sparse: true }, // Phone number for mobile login
-    loginType: { type: String, enum: ['social', 'admin'], required: true }, // To differentiate login types
-    role: { type: String, enum: ['user', 'admin'], default: 'user' }, // ✅ Role-based access
-    gender: { type: String, enum: ['male', 'female'] },
-    profileImage: { type: String } // Store image URL or path
+    loginType: { type: String, enum: ['social'], required: true }, // To differentiate login types
+    role: { type: String, default: 'user' }, // ✅ Role-based access
+    gender: { type: String },
+    fan: { type: String },
+    profileImage: { type: String }, // Store image URL or path
+
 },);
+
 
 
 module.exports = mongoose.model("User", userSchema)

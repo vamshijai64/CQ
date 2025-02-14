@@ -2,9 +2,8 @@
 const Review = require('../models/reviewModel');
 const User = require('../models/userModel');
 
-exports.addReview = async (title, reviewData) => {
-    const { userId, rating, reviewText,imageUrl } = reviewData;
-
+exports.addReview = async ({ userId, rating, reviewText, title, imageUrl }) => {
+  
     const existingUser = await User.findById(userId);
     if(!existingUser) throw new Error('User does not exist');
 

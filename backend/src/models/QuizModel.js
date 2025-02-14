@@ -10,11 +10,12 @@ const quizSchema = new mongoose.Schema({
     ref: 'Subcategory', 
     required: true 
   },
-  // category: { 
-  //   type: mongoose.Schema.Types.ObjectId, 
-  //   ref: 'Category', 
-  //   required: true 
-  // },
+  category: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Category', 
+    required: true 
+  },
+  
 
   questions: [
     {
