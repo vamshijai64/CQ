@@ -6,7 +6,7 @@ const subcategorySchema = new mongoose.Schema({
   
   name: { type: String, required: true },
 
-  imageUrl:{type:String,required:true},
+  image:{type:String},
 
   category: { 
     type: mongoose.Schema.Types.ObjectId, 
@@ -20,6 +20,8 @@ const subcategorySchema = new mongoose.Schema({
   }
 ]
 }, { timestamps: true });
+// ✅ Create a case-insensitive unique index
+subcategorySchema.index({ name: 1 }, { unique: true });
 
 
 

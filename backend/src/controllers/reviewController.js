@@ -2,19 +2,26 @@ const reviewService = require('../services/reviewService');
 
 exports.addReview = async (req, res) => {
     try {
-        const { title } = req.params;
-        const {reviewData,imageUrl} = req.body;
+        const { userId, rating, reviewText, title } = req.body;
 
-        const review = await reviewService.addReview(title, imageUrl,reviewData);
+        // ✅ Get image path from uploaded file
+        let imageUrl = null;
+        if (req.file) {
+            imageUrl = `/uploads/${req.file.filename}`;
+        }
+
+        const review = await reviewService.addReview({userId, rating, reviewText, title, imageUrl });
         res.status(201).json(review);
     } catch (error) {
         res.status(500).json({ error: error.message });
+        console.log(error);
+        
     }
 };
 
 exports.getReviews = async (req, res) => {
     try {
-        const { title } = req.params;
+        const { title } = req.body;
 
         const reviews = await reviewService.getReviews(title);
         res.status(200).json(reviews);

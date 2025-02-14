@@ -28,7 +28,7 @@ const upload = multer({
         if (extname && mimetype) {
             return cb(null, true);
         } else {
-            cb(new Error('Only images (jpeg, jpg, png) are allowed'));
+            cb(new Error('Only images (jpeg, jpg, png), files are allowed'));
         }
     }
 })

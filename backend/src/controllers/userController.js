@@ -37,6 +37,11 @@ exports.socialLogin = async (req, res) => {
 exports.getUserProfile = async (req, res) => {
     try {
         const { userId } = req.params;
+
+            if (!userId) {
+                return res.status(400).json({ error: "Invalid user ID" });
+            }
+        
         const user = await userService.getUserById(userId);
         if(!user) {
             return res.status(404).json({ error: 'User not found' })
@@ -47,11 +52,21 @@ exports.getUserProfile = async (req, res) => {
     }
 };
 
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await userService.getAllUsers();
+        if(!users || users.length === 0) {
+            return res.status(404).json({ error: 'No users found' })
+        }
+        res.status(200).json(users)
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
 exports.updateUserProfile = async (req, res) => {
     try {
-        const { userId, username } = req.body;
-
+        const { userId, username, gender, fan } = req.body;
         const updateData = {};
 
         // Check if username is provided and whether it already exists
@@ -63,16 +78,50 @@ exports.updateUserProfile = async (req, res) => {
             updateData.username = username;
         }
 
-        if (req.file) updateData.profileImage = req.file.path; // Save new image path
+        if (req.file?.path) updateData.profileImage = req.file.path; // Save new image path
+
+        if(gender) updateData.gender = gender;
+        if(fan) updateData.fan = fan
 
         const updatedUser = await userService.updateUserProfile(userId, updateData);
         res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
     } catch (error) {
-        console.log('error',error);
-        
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        // await userService.forgetPassword(email);
+        await userService.forgetPassword(email);
+        res.status(200).json({ message: 'OTP sent successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.validateOtp = async (req, res) => {
+   try {
+    const { email, otp } = req.body;
+    await userService.validateOtp(email, otp);
+    res.status(200).json({ message: 'OTP validated successfully' }); 
+   } catch (error) {
+    res.status(500).json({ error: error.message });
+   }
+}
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        await userService.resetPassword(email, otp, newPassword);
+        res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
 
 
 

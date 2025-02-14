@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-//require('dotenv-safe').config();
+
 require('dotenv').config();
 
 const dbUrl = process.env.MONGO_URI;

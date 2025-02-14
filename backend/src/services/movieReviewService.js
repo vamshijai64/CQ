@@ -1,14 +1,19 @@
 const MovieReviewModel=require('../models/movieReview')
 
 exports.addMovieReview = async ({ title, content, rating,imageUrl, user }) => {
-    const review = new MovieReviewModel({
-        title,
-        content,
-        rating,
-        imageUrl,
-        user,
-    });
-    return await review.save();
+    try {
+        const review = new MovieReviewModel({
+          title,
+          content,
+          rating,
+          imageUrl,
+          user,
+        });
+    
+        return await review.save();
+      } catch (error) {
+        throw new Error("Error saving movie review: " + error.message);
+      }
 };
 exports.getMovieReviews=async(req,res)=>{
     return await MovieReviewModel.find().sort({createdAt:-1}).populate('user');

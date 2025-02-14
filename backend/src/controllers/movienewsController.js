@@ -1,18 +1,16 @@
 const movieNewsService = require('../services/movienewsService');
-
-
 exports.addMovieNews = async (req, res) => {
     try {
         // Extract the fields from the request body
-        const { title, description, imageUrl } = req.body;
+        const { title, description } = req.body;
+        const imageFile = req.file;
 
-        // // Validation for missing fields
-        // if (!title || !description || !imageUrl) {
-        //     return res.status(400).json({ error: "All fields (title, description, imageUrl) are required." });
-        // }
+        let imageUrl = null;
+        if (imageFile) {
+            imageUrl = `/uploads/${imageFile.filename}`;
+        }
 
-        // Call the service layer to handle the business logic
-        const news = await movieNewsService.addMovieNews({ title, description, imageUrl });
+    const news = await movieNewsService.addMovieNews({ title, description, imageUrl });
 
         res.status(201).json({ message: "Movie news added successfully", news });
         console.log(news, "movienews");
@@ -21,8 +19,6 @@ exports.addMovieNews = async (req, res) => {
         console.error("movienews error:", error);
     }
 };
-
-
 exports.getMovieNewsById=async(req,res)=>{
     try{
         const {id}=req.params
@@ -48,3 +44,18 @@ exports.getMovieNews = async (req, res) => {
     }
 };
 
+exports.getLatestMovieNews = async (req, res) => {
+    try {
+        const { page = 1, limit = 10, search } = req.query;
+
+        const news = await movieNewsService.getLatestMovieNews({
+            page: parseInt(page),
+            limit: parseInt(limit),
+            search
+        });
+
+        res.status(200).json(news);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}

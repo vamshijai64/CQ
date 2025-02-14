@@ -10,8 +10,10 @@ const movienewsSchema = new mongoose.Schema({
         required:true,
     },
     imageUrl:{type:String,required:true},
-    //source:{type:String,required:true},
-    createdAt: { type: Date, default: Date.now },
+   
+},
+{
+    timestamps: true, // ✅ This adds both `createdAt` and `updatedAt` fields
 });
 
 module.exports = mongoose.model('Movienews', movienewsSchema);
